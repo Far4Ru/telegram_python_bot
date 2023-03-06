@@ -2,7 +2,7 @@ import telebot
 from random import *
 from telebot import types
 
-bot = telebot.TeleBot('***')
+bot = telebot.TeleBot('**')
 
 @bot.message_handler(commands=['start'])  # отслеживает получаемые человеком сообщения и сверяет со списком
 def start(message):  # message -- то, что вводит пользователь
