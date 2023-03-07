@@ -2,7 +2,7 @@ import telebot
 from random import *
 from telebot import types
 
-bot = telebot.TeleBot('***')
+bot = telebot.TeleBot('5951923973:AAFYg3ybwMPf5QtUL0xFViLSMdpdpa5TPHE')
 
 @bot.message_handler(commands=['start'])  # отслеживает получаемые человеком сообщения и сверяет со списком
 def start(message):  # message -- то, что вводит пользователь
@@ -50,14 +50,14 @@ def rules_first(message):
         markup.add(rule_go, rule_back)
         bot.send_message(message.chat.id, '''Всё просто: бот загадывает цифру от 1 до 10, твоя задача -- отгадать её.
 Приступим?''', reply_markup=markup)
-        bot.register_next_step_handler(message, game_first)
+        bot.register_next_step_handler(message, start_game_first)
     elif message.text == 'Нет':
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
         rule_go = types.KeyboardButton('Вперёд!')
         rule_back = types.KeyboardButton('Я передумал')
         markup.add(rule_go, rule_back)
         bot.send_message(message.chat.id, 'да ты умник, я смотрю', reply_markup=markup)
-        bot.register_next_step_handler(message, game_first)
+        bot.register_next_step_handler(message, start_game_first)
 
 @bot.message_handler()
 def rules_second(message):
@@ -68,28 +68,59 @@ def rules_second(message):
         markup.add(rule_yes, rule_no)
         bot.send_message(message.chat.id, '''Тебе даётся 10 попыток для того, чтобы угадать слово.
 За каждую ошибку к виселице пририсовывается часть человечка. Когда человечек будет полностью нарисован -- игра заканчивается.''', reply_markup=markup)
-        bot.register_next_step_handler(message, game_second)
+        bot.register_next_step_handler(message, start_game_second)
     elif message.text == 'Нет':
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
         rule_yes = types.KeyboardButton('Вперёд!')
         rule_no = types.KeyboardButton('Я передумал')
         markup.add(rule_yes, rule_no)
         bot.send_message(message.chat.id, 'да ты умник, я смотрю', reply_markup=markup)
-        bot.register_next_step_handler(message, game_second)
+        bot.register_next_step_handler(message, start_game_second)
 
 @bot.message_handler()
-def game_first(message):
+def start_game_first(message):
     if message.text == 'Вперёд!':
-        bot.send_message(message.chat.id, 'тут начинается числовая угадайка')
+        bot.send_message(message.chat.id, 'Бот загадал цифру!')
+        bot.register_next_step_handler(message, game_first)
     elif message.text == 'Я передумал':
         bot.send_message(message.chat.id, 'Как скажешь')
 
 @bot.message_handler()
-def game_second(message):
+def start_game_second(message):
     if message.text == 'Вперёд!':
         bot.send_message(message.chat.id, 'тут начинается виселица')
     elif message.text == 'Я передумал':
         bot.send_message(message.chat.id, 'Как скажешь')
+
+@bot.message_handler()
+def game_first(message):
+    bot_number = randint(1, 10)
+    while message.text != bot_number:
+        bot.send_message(message.chat.id, 'Твоё предположение?')
+        user_number = message.text
+        if int(user_number) < bot_number:
+            bot.send_message(message.chat.id, 'Маловато')
+        elif int(user_number) > bot_number:
+            bot.send_message(message.chat.id, 'Многовато')
+        else:
+            bot.send_message(message.chat.id, 'Ты угадал!')
+            markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
+            rule_yes = types.KeyboardButton('Да')
+            rule_no = types.KeyboardButton('Нет')
+            markup.add(rule_yes, rule_no)
+            bot.send_message(message.chat.id, 'Хочешь сыграть ещё раз?', reply_markup=markup)
+            bot.register_next_step_handler(message, game_again)
+        break
+
+
+@bot.message_handler()
+def game_again(message):
+    if message.text == 'Да':
+        bot.register_next_step_handler(message, game_first)
+    elif message.text == 'Нет':
+        bot.send_message(message, 'Очень жаль. Возвращайся, когда появится желание.')
+
+
 
 @bot.message_handler()
 def game1(message):
