@@ -2,15 +2,17 @@ import os
 from dotenv import load_dotenv
 from pathlib import Path
 
-from game import Game
+from app.bot import Bot
+
+
+def get_token():
+    load_dotenv(dotenv_path=Path(os.getcwd() + '/.env'))
+    return os.getenv('BOT_TOKEN')
 
 
 def load():
-    dotenv_path = Path(os.getcwd() + '/.env')
-    load_dotenv(dotenv_path=dotenv_path)
-    BOT_TOKEN = os.getenv('BOT_TOKEN')
-    game = Game(BOT_TOKEN)
-    game.start()
+    bot = Bot(get_token())
+    bot.start()
 
 
 def main():
